@@ -7,7 +7,7 @@ import random
 def scrape_listings():
     page_num = 1
     while page_num <= 50:
-        cities = ['salt-lake-city-ut', 'oklahoma-city-ok', 'seattle-wa', 'denver-co', 'austin-tx', 'boston-ma', 'orlando-fl', 'buffalo-ny', 'milwaukee-wi', 'chicago-il', 'boise-id', 'fargo-nd', 'bismarck-nd', 'phoenix-az', 'los-angeles-ca', 'reno-nv', 'santa-fe-nm', 'witchita-ks', 'new-orleans-la', 'little-rock-ar', 'atlanta-ga', 'billings-mt', 'detroit-mi', 'sacramento-ca', 'st-louis-mo', 'cheyenne-wy', 'augusta-me', 'richmond-va', 'lincoln-ne', 'charleston-sc', 'portland-or', 'provo-ut']
+        cities = ['salt-lake-city-ut', 'oklahoma-city-ok', 'seattle-wa', 'denver-co', 'austin-tx', 'boston-ma', 'orlando-fl', 'buffalo-ny', 'milwaukee-wi', 'chicago-il', 'boise-id', 'fargo-nd', 'bismarck-nd', 'phoenix-az', 'los-angeles-ca', 'reno-nv', 'santa-fe-nm', 'witchita-ks', 'new-orleans-la', 'little-rock-ar', 'atlanta-ga', 'billings-mt', 'detroit-mi', 'sacramento-ca', 'st-louis-mo', 'cheyenne-wy', 'augusta-me', 'richmond-va', 'lincoln-ne', 'charleston-sc', 'portland-or', 'provo-ut', 'new-york-ny', 'spokane-wa', 'indianapolis-in', 'flagstaff-az', 'sioux-falls-sd', 'springfield-mo', 'carson-city-nv', 'charlottesville-va', 'el-paso-tx']
         url= f'https://www.truecar.com/used-cars-for-sale/listings/location-{random.choice(cities)}/?excludeExpandedDelivery=true&page={page_num}&searchRadius=500'
 
         response = requests.get(url, timeout=10)
@@ -33,7 +33,7 @@ def scrape_listings():
             try:
                 vin.append(result.find('div', {'class':'vehicle-card-vin-carousel mt-1 text-xs'}).get_text())
             except:
-                vin.append('n/a')
+                exit
             # header
             try:
                 header.append(result.find('div', {'class':'vehicle-card-header'}).get_text())
@@ -49,7 +49,7 @@ def scrape_listings():
             try:
                 price.append(result.find('div', {'class':'vehicle-card-bottom-pricing-secondary pl-3 lg:pl-2 vehicle-card-bottom-max-50'}).get_text())
             except:
-                price.append('n/a')
+                exit
             
             # mileage
             try:
