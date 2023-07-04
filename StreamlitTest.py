@@ -14,6 +14,7 @@ conn = duckdb.connect()
 # declare main DataFrame
 listings  = conn.sql('SELECT * FROM clean_training_data.csv').to_df()
 
+st.header("Select Your Vehicle")
 # Create Integer Object for Model Year
 
 year_selector = st.number_input(label='Model Year', value=2023, min_value=1997, max_value=2024)
@@ -49,11 +50,32 @@ with col3:
         trims = pd.Series(trims['trim'])
         trims = trims.tolist()
         trim_selector = st.selectbox(label='Trim', options=[trim for trim in trims])
+        
 # Create Select Object for Transmission
 st.text("")
 st.text("")
-col4, col5 = st.columns([2,2])
+st.header("Select Vehicle Specifications")
+col4, col5 = st.columns([1,1])
 with col4:
+    mileage_selector = st.number_input(label='Mileage', value=0, min_value=0, max_value=412000, step=1000)
+with col5:
+    engines = pd.DataFrame(conn.sql(f'''SELECT DISTINCT engine FROM listings WHERE TRIM(make) = '{str(make_selector)}' AND TRIM(model) = '{str(model_selector)}' AND TRIM(trim) LIKE '%{str(trim_selector)}%' AND year = {year_selector} ORDER BY engine''').to_df())
+    engines = pd.Series(engines['engine'])
+    engines = engines.tolist()
+    engine_selector = st.selectbox(label='Engine', options=[engine for engine in engines])
+col6, col7, col8 = st.columns([1,1,1])
+with col6:
+    try:
+        fuel_types = pd.DataFrame(conn.sql(f'''SELECT DISTINCT fuel_type FROM listings WHERE TRIM(make) = '{str(make_selector)}' AND TRIM(model) = '{str(model_selector)}' AND TRIM(trim) LIKE '%{str(trim_selector)}%' AND year = {year_selector} ORDER BY fuel_type''').to_df())
+        fuel_types = pd.Series(fuel_types['fuel_type'])
+        fuel_types = fuel_types.tolist()
+        fuel_selector = st.selectbox(label='Fuel Type', options=[fuel_type for fuel_type in fuel_types])
+    except:
+        fuel_types = pd.DataFrame(conn.sql(f'''SELECT DISTINCT fuel_type FROM listings WHERE TRIM(make) = '{str(make_selector)}' AND TRIM(make) = '{str(model_selector)}' ''').to_df())
+        fuel_types = pd.Series(fuel_types['fuel_type'])
+        fuel_types = fuel_types.tolist()
+        fuel_selector = st.selectbox(label='Fuel Type', options=[fuel_type for fuel_type in fuel_types])
+with col7:
     try:
         transmissions = pd.DataFrame(conn.sql(f'''SELECT DISTINCT transmission FROM listings ORDER BY transmission''').to_df())
         transmissions = pd.Series(transmissions['transmission'])
@@ -64,7 +86,7 @@ with col4:
         transmissions = pd.Series(transmissions['transmission'])
         transmissions = transmissions.tolist()
         transmission_selector = st.selectbox(label='Transmission', options=[transmission for transmission in transmissions])
-with col5:
+with col8:
     try:
         drivetrains = pd.DataFrame(conn.sql(f'''SELECT DISTINCT drivetrain FROM listings WHERE TRIM(make) = '{str(make_selector)}' AND TRIM(model) = '{str(model_selector)}' AND year = {year_selector} ORDER BY trim''').to_df())
         drivetrains = pd.Series(drivetrains['drivetrain'])
@@ -77,8 +99,9 @@ with col5:
         drivetrain_selector = st.selectbox(label='Drivetrain', options=[drivetrain for drivetrain in drivetrains])
 st.text("")
 st.text("")
-col6, col7, = st.columns([2,2])
-with col6:
+st.header('Select Vehicle Colors')
+col9, col10, = st.columns([2,2])
+with col9:
     try:
         exterior_colors = pd.DataFrame(conn.sql(f'''SELECT DISTINCT exterior_color FROM listings WHERE TRIM(make) = '{str(make_selector)}' AND TRIM(model) = '{str(model_selector)}' AND trim LIKE '%{str(trim_selector)}%' AND year = {year_selector} ORDER BY exterior_color''').to_df())
         exterior_colors = pd.Series(exterior_colors['exterior_color'])
@@ -89,7 +112,7 @@ with col6:
         exterior_colors = pd.Series(exterior_colors['exterior_color'])
         exterior_colors = exterior_colors.tolist()
         ex_color_selector = st.selectbox(label='Exterior Color', options=[ex_color for ex_color in exterior_colors])
-with col7:
+with col10:
     try:
         interior_colors = pd.DataFrame(conn.sql(f'''SELECT DISTINCT interior_color FROM listings WHERE TRIM(make) = '{str(make_selector)}' AND TRIM(model) = '{str(model_selector)}' AND TRIM(trim) LIKE '%{str(trim_selector)}%' AND year = {year_selector} ORDER BY interior_color''').to_df())
         interior_colors = pd.Series(interior_colors['interior_color'])
@@ -100,8 +123,11 @@ with col7:
         interior_colors = pd.Series(interior_colors['interior_color'])
         interior_colors = interior_colors.tolist()
         int_color_selector = st.selectbox(label='Interior Color', options=[int_color for int_color in interior_colors])
-col8, col9, col10 = st.columns([1,0.2,3])
-with col8:
+st.text("")
+st.text("")
+st.header('Select Vehicle Location')
+col11, col12, col13 = st.columns([1,0.2,3])
+with col11:
     try:
         states = pd.DataFrame(conn.sql(f'''SELECT DISTINCT CASE WHEN state IS NULL THEN 'Online' ELSE state END state FROM listings ORDER BY state''').to_df())
         states = pd.Series(states['state'])
@@ -112,7 +138,7 @@ with col8:
         states = pd.Series(states['state'])
         states = states.tolist()
         state_selector = st.selectbox(label='State', options=[state for state in states], disabled=True)
-with col10:
+with col13:
     try:
         cities = pd.DataFrame(conn.sql(f'''SELECT DISTINCT CASE WHEN state IS NULL THEN NULL ELSE city END city FROM listings WHERE TRIM(state) = '{str(state_selector)}' ORDER BY city''').to_df())
         cities = pd.Series(cities['city'])
