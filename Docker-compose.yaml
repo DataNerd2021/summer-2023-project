@@ -1,0 +1,15 @@
+version: '3'
+services:
+  truelistingapi :
+    build: ./TrueListingAPI
+    ports:
+      - "2020:3091"
+    environment:
+      - apiHost = localhost
+      - apiPort = 3091
+  nginx:
+      build: ./nginx
+      ports:
+        - "2005:80"
+      depends_on:
+        - truelistingapi

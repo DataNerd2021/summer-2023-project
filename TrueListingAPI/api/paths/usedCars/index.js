@@ -1,3 +1,15 @@
+const {execSync} = require('child_process');
+const path = require('path');
+
+
+function getListingData(){
+    console.log(__dirname);
+    const scriptPath = path.join(__dirname, '..', '..', 'GetTrueListingMicroservice', 'GetCarData.py');
+    const result = execSync(`python ${scriptPath}`).toString();
+    const data = JSON.parse(result);
+    return data;
+}
+
 
 module.exports = function() {
     let operations = {
@@ -5,8 +17,8 @@ module.exports = function() {
     }
 
     async function GET(req,res,next){
-        //load in microservice
-        res.status(200).json(object);
+        const ListingData = getListingData()
+        res.status(200).json(ListingData);
     }
 
     GET.apiDoc = {
