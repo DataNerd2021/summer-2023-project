@@ -1,14 +1,4 @@
-const {execSync} = require('child_process');
-const path = require('path');
-
-
-function getListingData(){
-    console.log(__dirname);
-    const scriptPath = path.join(__dirname, '..', '..', 'GetTrueListingMicroservice', 'GetCarData.py');
-    const result = execSync(`python ${scriptPath}`).toString();
-    const data = JSON.parse(result);
-    return data;
-}
+const {fetchDataFromBigQuery} = require('../../../retrieveData/index');
 
 
 module.exports = function() {
@@ -17,7 +7,7 @@ module.exports = function() {
     }
 
     async function GET(req,res,next){
-        const ListingData = getListingData()
+        const ListingData = await fetchDataFromBigQuery()
         res.status(200).json(ListingData);
     }
 

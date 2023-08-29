@@ -1,6 +1,6 @@
 const { Kafka } = require('kafkajs');
 
-const brokerAddress = "pricebroker:29092";
+const brokerAddress = "broker10:29092";
 
 const kafka = new Kafka({   // We made a kafka client here, but didn't tell how to connect
     brokers: [brokerAddress],

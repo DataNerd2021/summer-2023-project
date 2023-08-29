@@ -7,23 +7,22 @@ module.exports = function() {
 
     async function POST(req,res,next){
         let vehicle = {
-            vin: req.body.vin,
-            header: req.body.header,
+            year: req.body.year,
+            make: req.body.make,
+            model: req.body.model,
             trim: req.body.trim,
-            price: req.body.price,
-            location: req.body.location,
             mileage: req.body.mileage,
-            exterior_color: req.body.exterior_color,
-            interior_color: req.body.interior_color,
-            fuel_type: req.body.fuel_type,
-            mpg: req.body.mpg,
+            engine: req.body.engine,
+            fuelType: req.body.fuelType,
             transmission: req.body.transmission,
             drivetrain: req.body.drivetrain,
-            engine: req.body.engine,
+            exteriorColor: req.body.exteriorColor,
+            interiorColor: req.body.interiorColor,
+            state: req.body.state,
+            city: req.body.city,
         }
         const vehicleToStream = await produceTrueListingMessage("create-vehicle", vehicle)
-        //load in microservice here
-        res.status(201).json(read);
+        res.status(201);
     }
     
     POST.apiDoc = {

@@ -6,11 +6,16 @@ import requests
 
 # set page configurations
 st.set_page_config(layout="centered", page_title='Used Car App')
-st.title('&ensp;&ensp;&ensp;Used Car Price Prediciton App')
+st.title('&ensp;&ensp;&ensp;Used Car Price Prediciton App with API')
 st.text("")
 st.text("")
 st.text("")
 
+def truelistingCalls(endpoint,data):
+    base_url = "http://truelistingapi:2020"
+    url = f"{base_url}/{endpoint}"
+    response = requests.post(url,json=data)
+    
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r"extended-spark-381216-d0e2ae70606d.json"
 client = bigquery.Client(project='extended-spark-381216')
 
@@ -150,117 +155,32 @@ with col13:
         cities = pd.Series(cities['city'])
         cities = cities.tolist()
         city_selector = st.selectbox(label='City', options=[city for city in cities], disabled=True)
-prediction_query = client.query(f"""WITH year_encoded AS(SELECT {year_selector} AS year),
-                                make_encoded AS( 
-                                SELECT DISTINCT features.make 
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.make = '{make_selector}'),
-                                
-                                model_encoded AS( 
-                                SELECT DISTINCT features.model 
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.model = '{model_selector}'),
-                                
-                                trim_encoded AS( 
-                                SELECT DISTINCT features.trim
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.trim = '{trim_selector}'),
-                                
-                                mileage_encoded AS( 
-                                SELECT {mileage_selector} AS mileage),
-                                
-                                engine_encoded AS( 
-                                SELECT DISTINCT features.engine
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.engine = '{engine_selector}'),
-                                
-                                fuel_type_encoded AS( 
-                                SELECT DISTINCT features.fuel_type
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.fuel_type = '{fuel_selector}'),
-                                
-                                transmission_encoded AS( 
-                                SELECT DISTINCT features.transmission
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.transmission = '{transmission_selector}'
-                                LIMIT 1),
-                                
-                                drivetrain_encoded AS( 
-                                SELECT DISTINCT features.drivetrain
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.drivetrain = '{drivetrain_selector}'
-                                LIMIT 1),
-                                
-                                exterior_color_encoded AS( 
-                                SELECT DISTINCT features.exterior_color
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.exterior_color = '{ex_color_selector}'),
-                                
-                                interior_color_encoded AS( 
-                                SELECT DISTINCT features.interior_color
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.interior_color = '{int_color_selector}'),
-                                
-                                city_encoded AS( 
-                                SELECT DISTINCT features.city
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.city = '{city_selector}'),
-                                
-                                state_encoded AS( 
-                                SELECT DISTINCT features.state
-                                FROM `regression_tree_features.preprocessed_features` AS features
-                                JOIN `training_data.filtered_training_data` AS training ON features.vin = training.vin
-                                WHERE training.state = '{state_selector}'),
-                                
-                                user_inputs AS(
-                                SELECT * FROM year_encoded
-                                CROSS JOIN
-                                make_encoded
-                                CROSS JOIN
-                                model_encoded
-                                CROSS JOIN
-                                trim_encoded
-                                CROSS JOIN
-                                mileage_encoded
-                                CROSS JOIN 
-                                engine_encoded
-                                CROSS JOIN
-                                fuel_type_encoded
-                                CROSS JOIN
-                                transmission_encoded
-                                CROSS JOIN
-                                drivetrain_encoded
-                                CROSS JOIN
-                                exterior_color_encoded
-                                CROSS JOIN 
-                                interior_color_encoded
-                                CROSS JOIN
-                                city_encoded
-                                CROSS JOIN
-                                state_encoded),
-                                
-                                predictions AS(
-                                SELECT *
-                                FROM ML.PREDICT(MODEL `used_car_model.price_prediction_model`, (SELECT * FROM user_inputs)))
-                                
-                                SELECT predicted_price FROM predictions""").to_dataframe()
-predicted_price = round(prediction_query['predicted_price'].values[0], 2)
+            
+test_model =  {
+    "year": year_selector,
+    "make": make_selector,
+    "model": model_selector,
+    "trim": trim_selector,
+    "mileage": mileage_selector,
+    "engine": engine_selector,
+    "fuelType": fuel_selector,
+    "transmission": transmission_selector,
+    "drivetrain": drivetrain_selector,
+    "exteriorColor": ex_color_selector,
+    "interiorColor": int_color_selector,
+    "state": state_selector,
+    "city": city_selector,
+}
+
+# predicted_price = round(prediction_query['predicted_price'].values[0], 2)
 with col11:
     prediction_btn = st.button(label='Get Prediction')
+    
 with col13:
     clear_btn = st.button(label='Clear Output')
 
 if prediction_btn:
-    st.markdown("<h3>Predicted Price: <br><br> <h2>${:,.2f}</h2>".format(predicted_price), unsafe_allow_html=True)
+    truelistingCalls("pricing", test_model)
+    #st.markdown("<h3>Predicted Price: <br><br> <h2>${:,.2f}</h2>".format(predicted_price), unsafe_allow_html=True)
 elif clear_btn:
     st.markdown("")

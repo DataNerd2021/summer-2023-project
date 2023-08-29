@@ -2,7 +2,7 @@ const { BigQuery } = require('@google-cloud/bigquery');
 
 const bigquery = new BigQuery({
     projectId: 'extended-spark-381216',
-    keyFilename: 'service-account-key.json',
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
 });
 
 async function fetchDataFromBigQuery() {
