@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from google.cloud import bigquery
 import os
-import request 
+import requests 
 
 # set page configurations
 st.set_page_config(layout="centered", page_title='Used Car App')
@@ -11,14 +11,7 @@ st.text("")
 st.text("")
 st.text("")
 
-def truelistingCalls(endpoint, method='POST', params=None, data=None, headers=None):
-    base_url = "http://truelistingapi:3091"
-    url = f"{base_url}/{endpoint}"
-    response = requests.request(method, url, params=params, data=data, headers=headers)
-    if response.status_code == 200:
-        return response.json()
-
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r"C:\Users\Chase\Downloads\extended-spark-381216-d0e2ae70606d.json"
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r"extended-spark-381216-d0e2ae70606d.json"
 client = bigquery.Client(project='extended-spark-381216')
 
 main_table = '`training_data.filtered_training_data`'

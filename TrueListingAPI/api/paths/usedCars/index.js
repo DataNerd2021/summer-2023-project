@@ -1,3 +1,5 @@
+const {fetchDataFromBigQuery} = require('../../../retrieveData/index');
+
 
 module.exports = function() {
     let operations = {
@@ -5,8 +7,8 @@ module.exports = function() {
     }
 
     async function GET(req,res,next){
-        //load in microservice
-        res.status(200).json(object);
+        const ListingData = await fetchDataFromBigQuery()
+        res.status(200).json(ListingData);
     }
 
     GET.apiDoc = {

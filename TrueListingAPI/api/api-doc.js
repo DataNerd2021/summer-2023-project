@@ -21,7 +21,7 @@ const apiDoc={
             vin: {
                 type: "integer"
             },
-            Vehicle: {
+            vehicle: {
                 type: "object",
                 properties: {
                     vin: {

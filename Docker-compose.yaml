@@ -1,0 +1,58 @@
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: truelistingzookeeper
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+  broker:
+    container_name: broker10
+    image: confluentinc/cp-kafka:7.3.0
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker10:29092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+  truelistingapi :
+    build: ./TrueListingAPI
+    ports:
+      - "2020:3091"
+    environment:
+      - apiHost = localhost
+      - apiPort = 3091
+  nginx:
+      build: ./nginx
+      ports:
+        - "2005:80"
+      depends_on:
+        - truelistingapi
+  createpriceprediction:
+    build: ./postData
+    depends_on:
+      - broker
+  frontend:
+    build: ./Frontend
+    command: "streamlit run StreamlitTest.py --server.enableCORS=false --server.enableWebsocketCompression=false --server.enableXsrfProtection=false --server.headless=true"
+    volumes:
+      - /Frontend:/summer-2023-project
+    ports:
+      - "80:8501"
+    depends_on:
+      - broker
+  frontendwithapi:
+    build: ./FrontendwithAPI
+    command: "streamlit run testStreamlit.py --server.enableCORS=false --server.enableWebsocketCompression=false --server.enableXsrfProtection=false --server.headless=true"
+    volumes:
+      - /FrontendwithAPI:/summer-2023-project
+    ports:
+      - "2000:8501"
+    depends_on:
+      - broker
